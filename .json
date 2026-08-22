@@ -1,0 +1,54 @@
+import json
+import pandas as pd
+import kagglehub
+
+# 1. Download dataset automatically from Kaggle
+path = kagglehub.dataset_download("kalashnikov1405/rain-forecasting-in-india")
+df = pd.read_csv(f"{path}/rain_forecasting.csv")
+
+# 2. Generate JSONL file
+with open("weather_rainfall_warnings.jsonl", "w") as f:
+    for _, row in df.iterrows():
+        # Read numerical values safely
+        humidity = row.get("Humidity3pm", 50)
+        pressure = row.get("Pressure3pm", 1013)
+        wind = row.get("WindSpeed3pm", 10)
+        rain_next = str(row.get("RainTomorrow", "")).lower()
+
+        # Build dynamic warning classification
+        if rain_next in ["yes", "1", "true"] or humidity > 85:
+            status = "RED ALERT - HEAVY RAIN WARNING"
+            action = "High precipitation expected. Prepare for severe weather disruptions."
+        elif humidity > 70:
+            status = "ORANGE ALERT - MODERATE RAIN WARNING"
+            action = "Rainfall likely. Carry wet-weather gear."
+        else:
+            status = "CLEAR - NO WARNING"
+            action = "Dry conditions expected."
+
+        # Format exact Gemini Supervised Fine-Tuning JSON schema
+        entry = {
+            "contents": [
+                {
+                    "role": "user",
+                    "parts": [{
+                        "text": f"Evaluate the following weather observation and state if a rainfall warning is needed:\n"
+                                f"Location: {row.get('Location', 'Station')} | "
+                                f"MinTemp: {row.get('MinTemp', 'N/A')}°C | "
+                                f"MaxTemp: {row.get('MaxTemp', 'N/A')}°C | "
+                                f"Humidity: {humidity}% | "
+                                f"Pressure: {pressure} hPa | "
+                                f"WindSpeed: {wind} km/h"
+                    }]
+                },
+                {
+                    "role": "model",
+                    "parts": [{
+                        "text": f"Status: {status}\nRecommended Action: {action}"
+                    }]
+                }
+            ]
+        }
+        f.write(json.dumps(entry) + "\n")
+
+print("Generated weather_rainfall_warnings.jsonl successfully!")
