@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regime‑Aware AI · Monsoon Post‑Processing</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons (CDN - FIXED) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="header-grid">
+            <div class="title-block">
+                <h1>🌧️ Regime‑Aware AI Post‑Processing</h1>
+                <div class="subhead">
+                    <span><i class="fas fa-cloud-rain"></i> Monsoon Rainfall Forecasts</span>
+                    <span><i class="fas fa-map-pin"></i> District / Grid‑level</span>
+                    <span><i class="fas fa-calendar-alt"></i> Active‑Break‑Depression‑WD</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="org-badge">
+                    <i class="fas fa-university"></i> MoES · NCMRWF
+                    <span style="opacity:0.4; margin:0 0.2rem;">|</span>
+                    <i class="fas fa-code"></i> v2.1
+                </div>
+                <button class="btn btn-theme" id="themeToggle" aria-label="Toggle theme">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                    <span id="themeLabel">Dark</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- STATS ROW -->
+        <div class="stat-row">
+            <div class="stat-item"><i class="fas fa-wind"></i> <strong>4</strong> Regimes</div>
+            <div class="stat-item"><i class="fas fa-chart-line"></i> <strong>0.78</strong> ETS (heavy)</div>
+            <div class="stat-item"><i class="fas fa-crosshairs"></i> <strong>0.72</strong> POD</div>
+            <div class="stat-item"><i class="fas fa-flag"></i> <strong>0.21</strong> FAR</div>
+            <div class="stat-item"><i class="fas fa-vector-square"></i> FSS <strong>0.69</strong> (11x11)</div>
+        </div>
+
+        <!-- ACTION BAR -->
+        <div class="action-bar">
+            <button class="btn btn-warning" id="earlyWarningBtn">
+                <i class="fas fa-bell"></i> AI/ML Early Warning
+            </button>
+            <button class="btn btn-primary" id="locationBtn">
+                <i class="fas fa-location-dot"></i> Check Weather on Your Location
+            </button>
+            <span id="location-status">
+                <i class="fas fa-circle" style="font-size: 0.6rem;"></i> Not fetched
+            </span>
+            <span style="font-size:0.85rem; font-weight:500; color:var(--text-muted); margin-left:auto; display:flex; align-items:center; gap:0.4rem;">
+                <i class="fas fa-microchip" style="color:var(--accent-icon);"></i> Regime‑aware AI
+            </span>
+        </div>
+
+        <!-- CARDS: Expected Outcomes -->
+        <h2><i class="fas fa-bullseye"></i> Expected Outcomes</h2>
+        <div class="card-grid">
+            <div class="card">
+                <div class="icon"><i class="fas fa-brain"></i></div>
+                <h3>Weather regime classifier</h3>
+                <p>Active, Break, Depression, Coastal/Orographic &amp; WD — classified from large‑scale fields.</p>
+                <span class="tag"><i class="far fa-circle-check"></i> XGBoost + CNN</span>
+            </div>
+            <div class="card">
+                <div class="icon"><i class="fas fa-droplet"></i></div>
+                <h3>Bias‑corrected rainfall</h3>
+                <p>Regime‑specific quantile mapping &amp; XGBoost residual correction. Outperforms raw NWP.</p>
+                <span class="tag"><i class="fas fa-arrow-up"></i> RMSE ↓ 23%</span>
+            </div>
+            <div class="card">
+                <div class="icon"><i class="fas fa-triangle-exclamation"></i></div>
+                <h3>Heavy rainfall probability</h3>
+                <p>Probability exceeding 64.5 / 115.5 / 204.5 mm, calibrated per regime.</p>
+                <span class="tag"><i class="fas fa-percent"></i> 50‑member ensemble</span>
+            </div>
+            <div class="card">
+                <div class="icon"><i class="fas fa-map"></i></div>
+                <h3>District‑level product</h3>
+                <p>User‑friendly forecast table &amp; interactive map with colour‑coded risk.</p>
+                <span class="tag"><i class="fas fa-table"></i> CSV / GeoJSON</span>
+            </div>
+        </div>
+
+        <!-- VERIFICATION REPORT -->
+        <h2 style="margin-top:2.2rem;"><i class="fas fa-chart-simple"></i> Verification report · Skill comparison</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>RMSE (mm)</th>
+                        <th>ETS ↑</th>
+                        <th>CSI ↑</th>
+                        <th>POD ↑</th>
+                        <th>FAR ↓</th>
+                        <th>FSS (11x11)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Raw NWP</strong> (GFS)</td>
+                        <td>14.2</td>
+                        <td>0.31</td>
+                        <td>0.38</td>
+                        <td>0.49</td>
+                        <td>0.39</td>
+                        <td>0.44</td>
+                    </tr>
+                    <tr class="highlight-bg">
+                        <td><strong>Regime‑Aware (Ours)</strong></td>
+                        <td><span class="text-accent">10.9</span></td>
+                        <td><span class="text-accent">0.78</span></td>
+                        <td><span class="text-accent">0.72</span></td>
+                        <td><span class="text-accent">0.72</span></td>
+                        <td><span class="text-accent">0.21</span></td>
+                        <td><span class="text-accent">0.69</span></td>
+                    </tr>
+                    <tr>
+                        <td>Quantile Mapping (global)</td>
+                        <td>12.6</td>
+                        <td>0.52</td>
+                        <td>0.49</td>
+                        <td>0.58</td>
+                        <td>0.33</td>
+                        <td>0.56</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="margin-top:0.5rem; font-size:0.85rem; color:var(--text-muted); display:flex; gap:0.8rem; flex-wrap:wrap; transition:color var(--transition); font-weight:500;">
+            <span><i class="fas fa-circle-check" style="color:var(--accent-success);"></i> Heavy rain threshold ≥ 64.5 mm · 2022–2023 test</span>
+            <span><i class="fas fa-arrows-rotate" style="color:var(--accent-icon);"></i> ETS: Equitable Threat Score · CSI: Critical Success Index</span>
+        </div>
+
+        <!-- REGIME & PROBABILITY SNAPSHOT -->
+        <h2 style="margin-top:2.5rem;"><i class="fas fa-umbrella"></i> Regime‑based probability · sample districts</h2>
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px,1fr));">
+            <div class="card" style="border-left: 4px solid var(--accent-icon);">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="margin:0; font-size:1.1rem;">Mumbai</h3>
+                    <span class="regime-badge"><i class="fas fa-water"></i> Coastal</span>
+                </div>
+                <div style="margin-top:0.6rem;">
+                    <div style="display:flex; justify-content:space-between; font-weight:500; font-size:0.9rem;">
+                        <span>Heavy (≥64.5)</span>
+                        <span>84%</span>
+                    </div>
+                    <div class="prob-bar"><div class="prob-fill high" style="width:84%;"></div></div>
+                    <div style="display:flex; justify-content:space-between; font-weight:500; font-size:0.9rem; margin-top:0.3rem;">
+                        <span>V.heavy (≥115.5)</span>
+                        <span>47%</span>
+                    </div>
+                    <div class="prob-bar"><div class="prob-fill med" style="width:47%;"></div></div>
+                    <div style="margin-top:0.4rem; font-size:0.8rem; color:var(--text-muted);"><i class="far fa-clock"></i> bias‑corr: 21.3 → 18.7 mm</div>
+                </div>
+            </div>
+            <div class="card" style="border-left: 4px solid var(--accent-gold);">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="margin:0; font-size:1.1rem;">Delhi</h3>
+                    <span class="regime-badge"><i class="fas fa-cloud-sun"></i> Break</span>
+                </div>
+                <div style="margin-top:0.6rem;">
+                    <div style="display:flex; justify-content:space-between; font-weight:500; font-size:0.9rem;">
+                        <span>Heavy (≥64.5)</span>
+                        <span>12%</span>
+                    </div>
+                    <div class="prob-bar"><div class="prob-fill" style="width:12%;"></div></div>
+                    <div style="display:flex; justify-content:space-between; font-weight:500; font-size:0.9rem; margin-top:0.3rem;">
+                        <span>V.heavy (≥115.5)</span>
+                        <span>3%</span>
+                    </div>
+                    <div class="prob-bar"><div class="prob-fill" style="width:3%;"></div></div>
+                    <div style="margin-top:0.4rem; font-size:0.8rem; color:var(--text-muted);"><i class="far fa-clock"></i> bias‑corr: 7.8 → 6.2 mm</div>
+                </div>
+            </div>
+            <div class="card" style="border-left: 4px solid var(--accent-warning);">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="margin:0; font-size:1.1rem;">Chennai</h3>
+                    <span class="regime-badge"><i class="fas fa-cyclone"></i> Depression</span>
+                </div>
+                <div style="margin-top:0.6rem;">
+                    <div style="display:flex; justify-content:space-between; font-weight:500; font-size:0.9rem;">
+                        <span>Heavy (≥64.5)</span>
+                        <span>92%</span>
+                    </div>
+                    <div class="prob-bar"><div class="prob-fill high" style="width:92%;"></div></div>
+                    <div style="display:flex; justify-content:space-between; font-weight:500; font-size:0.9rem; margin-top:0.3rem;">
+                        <span>V.heavy (≥115.5)</span>
+                        <span>68%</span>
+                    </div>
+                    <div class="prob-bar"><div class="prob-fill high" style="width:68%;"></div></div>
+                    <div style="margin-top:0.4rem; font-size:0.8rem; color:var(--text-muted);"><i class="far fa-clock"></i> bias‑corr: 46.2 → 42.0 mm</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INFO STRIP -->
+        <div class="info-strip">
+            <div style="display:flex; gap:1.5rem; flex-wrap:wrap;">
+                <span><i class="fas fa-database"></i> <strong>Dataset</strong> IMD gridded + NCMRWF GFS</span>
+                <span><i class="fas fa-envelope"></i> <strong>Contact</strong> ncmrwf@moes.gov.in</span>
+                <span><i class="fas fa-tag"></i> Disaster Management · Software</span>
+            </div>
+            <span class="btn-outline" style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.4rem 1.4rem; border-radius:60px; font-weight:600; font-size:0.8rem; cursor:pointer;">
+                <i class="fas fa-arrow-right"></i> Explore on GitHub
+            </span>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <div>
+                <i class="fas fa-clipboard-list"></i> <strong>Problem Statement</strong> — Regime‑aware AI post‑processing for monsoon rainfall over India.
+            </div>
+            <div>
+                <i class="fas fa-file-alt"></i> v1.0 · Ministry of Earth Sciences (MoES)
+            </div>
+        </div>
+
+        <!-- FOOTNOTE -->
+        <div class="footnote">
+            <span><i class="fas fa-code"></i> VS Code ready — modular src/ · config/ · main.py</span>
+            <span><i class="fas fa-robot"></i> AI/ML: XGBoost · QuantileMapping · CNN (regime)</span>
+            <span><i class="fas fa-check-circle"></i> ETS, CSI, POD, FAR, FSS computed</span>
+        </div>
+
+    </div>
+
+    <!-- External JavaScript - Load at the end (FIXED: using javascript.js) -->
+    <script src="javascript.js"></script>
+</body>
+</html>
